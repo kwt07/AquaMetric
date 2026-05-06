@@ -1,0 +1,6 @@
+{
+  "name": "AquaMetric",
+  "description": "A public-interest tool to quantify freshwater consumption of AI tools for ESG reporting.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}
