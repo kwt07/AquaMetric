@@ -39,43 +39,43 @@ export default function App() {
     <div className="min-h-screen flex flex-col selection:bg-teal-200">
       {/* Navigation */}
       <header className="sticky top-0 z-50 bg-paper/80 backdrop-blur-md border-b border-navy/5 print:hidden">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between gap-6 overflow-hidden">
           <button 
             onClick={() => setCurrentPage('landing')}
-            className="flex items-center gap-2 text-navy-dark hover:opacity-80 transition-opacity"
+            className="flex items-center gap-2 text-navy-dark hover:opacity-80 transition-opacity shrink-0"
           >
             <Droplet className="w-6 h-6 text-teal" />
-            <span className="font-display font-bold text-xl tracking-tight">AquaMetric</span>
+            <span className="font-display font-bold text-xl tracking-tight hidden sm:block">AquaMetric</span>
           </button>
           
-          <nav className="flex items-center gap-6">
+          <nav className="flex items-center gap-2 sm:gap-6 overflow-x-auto hide-scrollbar pb-1 -mb-1 w-full justify-start sm:justify-end">
             <button 
               onClick={() => setCurrentPage('landing')}
-              className={`text-sm font-medium transition-all active:scale-95 px-4 py-2 rounded-lg ${currentPage === 'landing' ? 'text-teal bg-white shadow-sm' : 'text-navy-light hover:text-navy hover:bg-white/50 hover:shadow-sm'}`}
+              className={`text-sm font-medium transition-all shrink-0 active:scale-95 px-3 sm:px-4 py-2 rounded-lg ${currentPage === 'landing' ? 'text-teal bg-white shadow-sm' : 'text-navy-light hover:text-navy hover:bg-white/50 hover:shadow-sm'}`}
             >
               Overview
             </button>
             <button 
               onClick={() => setCurrentPage('calculator')}
-              className={`text-sm font-medium transition-all active:scale-95 px-4 py-2 rounded-lg ${currentPage === 'calculator' ? 'text-teal bg-white shadow-sm' : 'text-navy-light hover:text-navy hover:bg-white/50 hover:shadow-sm'}`}
+              className={`text-sm font-medium transition-all shrink-0 active:scale-95 px-3 sm:px-4 py-2 rounded-lg ${currentPage === 'calculator' ? 'text-teal bg-white shadow-sm' : 'text-navy-light hover:text-navy hover:bg-white/50 hover:shadow-sm'}`}
             >
               Calculator
             </button>
             <button 
               onClick={() => setCurrentPage('report')}
-              className={`text-sm font-medium transition-all active:scale-95 px-4 py-2 rounded-lg ${currentPage === 'report' ? 'text-teal bg-white shadow-sm' : 'text-navy-light hover:text-navy hover:bg-white/50 hover:shadow-sm'}`}
+              className={`text-sm font-medium transition-all shrink-0 active:scale-95 px-3 sm:px-4 py-2 rounded-lg ${currentPage === 'report' ? 'text-teal bg-white shadow-sm' : 'text-navy-light hover:text-navy hover:bg-white/50 hover:shadow-sm'}`}
             >
               ESG Report
             </button>
             <button 
               onClick={() => setCurrentPage('methodology')}
-              className={`text-sm font-medium transition-all active:scale-95 px-4 py-2 rounded-lg ${currentPage === 'methodology' ? 'text-teal bg-white shadow-sm' : 'text-navy-light hover:text-navy hover:bg-white/50 hover:shadow-sm'}`}
+              className={`text-sm font-medium transition-all shrink-0 active:scale-95 px-3 sm:px-4 py-2 rounded-lg ${currentPage === 'methodology' ? 'text-teal bg-white shadow-sm' : 'text-navy-light hover:text-navy hover:bg-white/50 hover:shadow-sm'}`}
             >
               Methodology
             </button>
             <button 
               onClick={() => setCurrentPage('research')}
-              className={`text-sm font-medium transition-all active:scale-95 px-4 py-2 rounded-lg ${currentPage === 'research' ? 'text-teal bg-white shadow-sm' : 'text-navy-light hover:text-navy hover:bg-white/50 hover:shadow-sm'}`}
+              className={`text-sm font-medium transition-all shrink-0 active:scale-95 px-3 sm:px-4 py-2 rounded-lg ${currentPage === 'research' ? 'text-teal bg-white shadow-sm' : 'text-navy-light hover:text-navy hover:bg-white/50 hover:shadow-sm'}`}
             >
               The Deep Dive
             </button>
