@@ -83,10 +83,16 @@ export default function App() {
         </div>
       </header>
 
+      {/* Print Header */}
+      <div className="hidden print:flex items-center gap-2 p-8 border-b border-slate-200">
+        <Droplet className="w-8 h-8 text-teal" />
+        <span className="font-display font-bold text-2xl tracking-tight text-navy-dark">AquaMetric / Disclosure</span>
+      </div>
+
       {/* Main Content */}
       <main className="flex-1">
         {currentPage === 'landing' && (
-          <Landing onStart={() => setCurrentPage('calculator')} />
+          <Landing onStart={() => setCurrentPage('calculator')} onDeepDive={() => setCurrentPage('research')} />
         )}
         
         {currentPage === 'calculator' && (
@@ -115,11 +121,11 @@ export default function App() {
       </main>
 
       {/* Footer */}
-      <footer className="py-8 border-t border-navy/5 text-center px-6 print:hidden">
-        <p className="text-xs text-navy-light/50 max-w-3xl mx-auto mb-4">
-          Estimates based on Li et al. (2025) and published research. Represents Scope 1+2 data center evaporative cooling only. Scope 3 semiconductor water not included. 250 working days/year assumed.
+      <footer className="py-8 border-t border-navy/5 text-center px-6 print:py-4 print:mt-12 print:border-t-0 p-8">
+        <p className="text-xs text-navy-light/50 max-w-3xl mx-auto mb-4 print:text-slate-500 print:text-left print:mb-2">
+          Estimates based on Li et al. (2025) and published research. Represents Scope 1+2 data center evaporative cooling only. Scope 3 semiconductor water not included. 250 working days/year assumed. AquaMetric does not claim to be a definitive regulatory standard.
         </p>
-        <p className="text-sm text-navy-light/60 font-medium tracking-wide">
+        <p className="text-sm text-navy-light/60 font-medium tracking-wide print:text-slate-400 print:text-left">
           AQUAMETRIC &copy; {new Date().getFullYear()} — AN OPEN PROPOSAL
         </p>
       </footer>

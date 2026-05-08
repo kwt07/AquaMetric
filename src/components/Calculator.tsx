@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { CalculatorState, calculateFootprint, AITool, Region } from '../lib/calculator';
-import { Droplet, Users, Zap, Cloud, GlassWater, Waves, AlertCircle, BarChart3, MapPin, Hash, Globe2, Info } from 'lucide-react';
+import { Droplet, Users, Zap, Cloud, GlassWater, Waves, AlertCircle, BarChart3, MapPin, Hash, Globe2, Info, Share2, Check } from 'lucide-react';
 
 const InfoTooltip = ({ content }: { content: React.ReactNode }) => (
   <div className="group relative flex items-center cursor-help">
@@ -28,6 +28,33 @@ export function Calculator({ state, onChange, onNext }: Props) {
 
   const [isDetecting, setIsDetecting] = useState(false);
   const [detectError, setDetectError] = useState<string | null>(null);
+  const [scaleMultiplier, setScaleMultiplier] = useState<number>(1);
+  const [copiedShare, setCopiedShare] = useState(false);
+
+  const scaledLiters = result.litersPerYear * scaleMultiplier;
+  const scaledBottles = result.bottles * scaleMultiplier;
+  const scaledBathtubs = result.bathtubs * scaleMultiplier;
+  const scaledHumanDays = result.humanDays * scaleMultiplier;
+
+  const handleShare = async () => {
+    const text = `I just calculated our organization's AI water footprint: ${scaledLiters.toLocaleString(undefined, { maximumFractionDigits: 0 })} liters of fresh water per year using AquaMetric.\n\nEvery AI query has a water bill. Measure yours to bring transparency to AI's systemic cost.`;
+    
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: 'AquaMetric: AI Water Footprint',
+          text: text,
+          url: window.location.href,
+        });
+      } else {
+        await navigator.clipboard.writeText(text + '\n' + window.location.href);
+        setCopiedShare(true);
+        setTimeout(() => setCopiedShare(false), 2000);
+      }
+    } catch (err) {
+      console.log('Error sharing', err);
+    }
+  };
 
   const handleDetectClimate = () => {
     setDetectError(null);
@@ -287,70 +314,109 @@ export function Calculator({ state, onChange, onNext }: Props) {
 
         {/* Dashboard / Outputs */}
         <div className="lg:col-span-7">
-          <div className="bg-navy p-6 md:p-8 rounded-2xl text-white shadow-xl h-full flex flex-col">
+          <div className="bg-navy p-6 md:p-8 rounded-2xl text-white shadow-xl h-full flex flex-col relative overflow-hidden">
             <h3 className="font-display font-medium text-teal-400 mb-6 flex items-center gap-2 uppercase tracking-wider text-sm">
               <BarChart3 className="w-4 h-4" /> Estimated Annual Footprint
             </h3>
-            <div className="mb-10">
+            <div className="mb-8">
               <div className="text-sm text-white/60 mb-2 font-medium">Total Freshwater Consumed (Liters/Year)</div>
               <div className="text-6xl md:text-7xl font-display font-bold tracking-tight">
-                {result.litersPerYear.toLocaleString()}
+                {scaledLiters.toLocaleString(undefined, { maximumFractionDigits: 0 })}
                 <span className="text-2xl text-white/40 ml-2 font-normal">L</span>
               </div>
               <div className="text-xs text-teal-100/60 mt-4 flex items-center gap-2 bg-white/5 w-fit px-3 py-2 rounded-lg border border-white/10">
-                <AlertCircle className="w-3.5 h-3.5 text-teal-400" />
+                <AlertCircle className="w-3.5 h-3.5 text-teal-400 shrink-0" />
                 <span>AI water is indirect but permanent — evaporated, not recycled.</span>
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4 md:gap-6 mb-10">
+            <div className="grid grid-cols-2 gap-4 md:gap-6 mb-8">
               <div className="bg-white/5 border border-white/10 p-4 rounded-xl">
                 <GlassWater className="w-6 h-6 text-teal-400 mb-3" />
-                <div className="text-2xl font-bold font-mono mb-1">{result.bottles.toLocaleString()}</div>
+                <div className="text-2xl font-bold font-mono mb-1">{scaledBottles.toLocaleString(undefined, { maximumFractionDigits: 0 })}</div>
                 <div className="text-xs text-white/60 leading-tight">Standard 500ml<br/>water bottles</div>
               </div>
               <div className="bg-white/5 border border-white/10 p-4 rounded-xl">
                 <Waves className="w-6 h-6 text-teal-400 mb-3" />
                 <div className="text-2xl font-bold font-mono mb-1">
-                  {result.bathtubs < 0.1 ? '< 0.1' : result.bathtubs.toFixed(1)}
+                  {scaledBathtubs < 0.1 ? '< 0.1' : scaledBathtubs.toLocaleString(undefined, { maximumFractionDigits: 1 })}
                 </div>
                 <div className="text-xs text-white/60 leading-tight">Standard bathtubs<br/>equivalent</div>
               </div>
             </div>
 
-            <div className={`mt-auto p-4 rounded-xl flex items-start gap-4 ${
-              result.rating === 'Minimal' ? 'bg-sky-500/10 text-sky-300 border border-sky-500/20' :
-              result.rating === 'Low' ? 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/20' :
-              result.rating === 'Moderate' ? 'bg-yellow-500/10 text-yellow-300 border border-yellow-500/20' :
-              result.rating === 'High' ? 'bg-orange-500/10 text-orange-300 border border-orange-500/20' :
+            <div className={`p-4 rounded-xl flex items-start gap-4 mb-8 ${
+              result.rating === 'Minimal' && scaleMultiplier === 1 ? 'bg-sky-500/10 text-sky-300 border border-sky-500/20' :
+              result.rating === 'Low' && scaleMultiplier === 1 ? 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/20' :
+              result.rating === 'Moderate' && scaleMultiplier === 1 ? 'bg-yellow-500/10 text-yellow-300 border border-yellow-500/20' :
+              (result.rating === 'High' || scaleMultiplier > 10) && scaleMultiplier <= 1000 ? 'bg-orange-500/10 text-orange-300 border border-orange-500/20' :
               'bg-red-500/10 text-red-300 border border-red-500/20'
             }`}>
               <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
               <div>
-                <div className="font-semibold text-sm mb-1 uppercase tracking-wider">Impact Rating: {result.rating}</div>
+                <div className="font-semibold text-sm mb-1 uppercase tracking-wider">
+                  {scaleMultiplier > 1 ? 'Scaled Impact' : `Impact Rating: ${result.rating}`}
+                </div>
                 <div className="text-sm opacity-80 leading-relaxed">
-                  This usage consumes enough drinking water to sustain one human for <strong>{result.humanDays.toLocaleString()}</strong> days.
+                  This usage consumes enough drinking water to sustain one human for <strong>{scaledHumanDays.toLocaleString(undefined, { maximumFractionDigits: 0 })}</strong> days.
+                  {scaledLiters > 2500000 && (
+                    <span className="block mt-2 pt-2 border-t border-current/20">
+                      That's equivalent to draining <strong>{(scaledLiters / 2500000).toLocaleString(undefined, { maximumFractionDigits: 1 })} Olympic-sized swimming pools</strong>.
+                    </span>
+                  )}
                 </div>
               </div>
             </div>
             
-            <div className="mt-8 bg-black/20 p-5 rounded-xl border border-white/5">
-              <h4 className="font-bold text-sm text-white flex items-center gap-2 mb-2">
-                <Globe2 className="w-4 h-4 text-teal-400" />
-                The Scale Multiplier
-              </h4>
+            <div className="mt-auto mb-6">
               <p className="text-sm text-white/70 leading-relaxed">
-                Think this is a small amount? You're not prompting alone. Generative AI is deployed at an explosive global rate. When humanity generates tens of billions of automated queries daily, this macro-level extraction scales to millions of gallons drained from local communities.
+                <strong className="text-white">Think this is a small amount?</strong> You're not prompting alone. Generative AI is deployed at an explosive global rate. When humanity generates tens of billions of automated queries daily, this macro-level extraction scales to millions of gallons drained from local communities.
               </p>
             </div>
 
-            <button
-              onClick={onNext}
-              className="mt-8 w-full bg-teal hover:bg-teal-light text-navy-dark px-6 py-4 rounded-xl font-bold transition-all"
-            >
-              Generate ESG Report Paragraph
-            </button>
+            <div className="bg-black/20 p-5 rounded-xl border border-white/5">
+              <div className="flex items-center justify-between mb-4">
+                <h4 className="font-bold text-sm text-white flex items-center gap-2">
+                  <Globe2 className="w-4 h-4 text-teal-400" />
+                  Scale Up Scenario
+                </h4>
+                <div className="text-sm font-medium text-teal-400 bg-teal-400/10 px-2 py-0.5 rounded">
+                  {scaleMultiplier}x
+                </div>
+              </div>
+              <p className="text-xs text-white/60 mb-4 leading-relaxed">
+                Individual or small team usage can look misleadingly small. Slide to see the impact if an entire enterprise or industry adopted this rate.
+              </p>
+              <input 
+                type="range" 
+                min="1" 
+                max="10000" 
+                step="1"
+                value={scaleMultiplier}
+                onChange={(e) => setScaleMultiplier(parseInt(e.target.value) || 1)}
+                className="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer accent-teal-400 mb-2"
+              />
+              <div className="flex justify-between text-xs text-white/40 font-medium">
+                <span>1x (Current)</span>
+                <span>10,000x (Industry)</span>
+              </div>
+            </div>
 
+            <div className="mt-6 flex flex-col sm:flex-row gap-4">
+              <button
+                onClick={onNext}
+                className="flex-1 bg-teal hover:bg-teal-light text-navy-dark px-6 py-4 rounded-xl font-bold transition-all text-center"
+              >
+                Generate ESG Report Paragraph
+              </button>
+              <button
+                onClick={handleShare}
+                className="flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 text-white px-6 py-4 rounded-xl font-bold transition-all border border-white/5"
+              >
+                {copiedShare ? <Check className="w-5 h-5 text-teal-400" /> : <Share2 className="w-5 h-5" />}
+                {copiedShare ? 'Copied Link' : 'Share Results'}
+              </button>
+            </div>
           </div>
         </div>
       </div>
