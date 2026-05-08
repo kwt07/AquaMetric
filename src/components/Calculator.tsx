@@ -17,9 +17,11 @@ interface Props {
   state: CalculatorState;
   onChange: (state: CalculatorState) => void;
   onNext: () => void;
+  initialScaleMultiplier?: number;
+  shouldScrollToResults?: boolean;
 }
 
-export function Calculator({ state, onChange, onNext }: Props) {
+export function Calculator({ state, onChange, onNext, initialScaleMultiplier = 1, shouldScrollToResults = false }: Props) {
   const result = calculateFootprint(state);
 
   const updateState = (updates: Partial<CalculatorState>) => {
@@ -28,8 +30,17 @@ export function Calculator({ state, onChange, onNext }: Props) {
 
   const [isDetecting, setIsDetecting] = useState(false);
   const [detectError, setDetectError] = useState<string | null>(null);
-  const [scaleMultiplier, setScaleMultiplier] = useState<number>(1);
+  const [scaleMultiplier, setScaleMultiplier] = useState<number>(initialScaleMultiplier);
   const [copiedShare, setCopiedShare] = useState(false);
+  const resultsRef = React.useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (shouldScrollToResults && resultsRef.current) {
+      setTimeout(() => {
+        resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+    }
+  }, [shouldScrollToResults]);
 
   const scaledLiters = result.litersPerYear * scaleMultiplier;
   const scaledBottles = result.bottles * scaleMultiplier;
@@ -39,15 +50,25 @@ export function Calculator({ state, onChange, onNext }: Props) {
   const handleShare = async () => {
     const text = `I just calculated our organization's AI water footprint: ${scaledLiters.toLocaleString(undefined, { maximumFractionDigits: 0 })} liters of fresh water per year using AquaMetric.\n\nEvery AI query has a water bill. Measure yours to bring transparency to AI's systemic cost.`;
     
+    const shareUrl = new URL(window.location.origin + window.location.pathname);
+    shareUrl.searchParams.set('p', 'calculator');
+    shareUrl.searchParams.set('method', state.method || 'queries');
+    shareUrl.searchParams.set('emp', state.employeeCount.toString());
+    shareUrl.searchParams.set('qpd', state.queriesPerDay.toString());
+    shareUrl.searchParams.set('tokens', state.monthlyTokensMillions.toString());
+    shareUrl.searchParams.set('tool', state.primaryTool || 'gpt4');
+    shareUrl.searchParams.set('region', state.region || 'temperate');
+    shareUrl.searchParams.set('scale', scaleMultiplier.toString());
+
     try {
       if (navigator.share) {
         await navigator.share({
           title: 'AquaMetric: AI Water Footprint',
           text: text,
-          url: window.location.href,
+          url: shareUrl.toString(),
         });
       } else {
-        await navigator.clipboard.writeText(text + '\n' + window.location.href);
+        await navigator.clipboard.writeText(text + '\n' + shareUrl.toString());
         setCopiedShare(true);
         setTimeout(() => setCopiedShare(false), 2000);
       }
@@ -313,7 +334,7 @@ export function Calculator({ state, onChange, onNext }: Props) {
         </div>
 
         {/* Dashboard / Outputs */}
-        <div className="lg:col-span-7">
+        <div ref={resultsRef} className="lg:col-span-7">
           <div className="bg-navy p-6 md:p-8 rounded-2xl text-white shadow-xl h-full flex flex-col relative overflow-hidden">
             <h3 className="font-display font-medium text-teal-400 mb-6 flex items-center gap-2 uppercase tracking-wider text-sm">
               <BarChart3 className="w-4 h-4" /> Estimated Annual Footprint

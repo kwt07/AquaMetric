@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Droplet } from 'lucide-react';
 import { Landing } from './components/Landing';
 import { Calculator } from './components/Calculator';
@@ -18,7 +18,18 @@ export interface ReportState {
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState<Page>('landing');
+  const [visitedPages, setVisitedPages] = useState<Set<Page>>(new Set(['landing']));
+  const [initialScale, setInitialScale] = useState<number>(1);
+  const [shouldScroll, setShouldScroll] = useState<boolean>(false);
   
+  const handlePageChange = (newPage: Page) => {
+    setCurrentPage(newPage);
+    if (!visitedPages.has(newPage)) {
+      window.scrollTo(0, 0);
+      setVisitedPages(prev => new Set(prev).add(newPage));
+    }
+  };
+
   const [calcState, setCalcState] = useState<CalculatorState>({
     method: 'queries',
     employeeCount: 100,
@@ -35,13 +46,44 @@ export default function App() {
     customAction: '',
   });
 
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('p') === 'calculator') {
+      const newCalcState = { ...calcState };
+      const method = params.get('method');
+      if (method === 'queries' || method === 'tokens') newCalcState.method = method;
+      
+      const emp = params.get('emp');
+      if (emp) newCalcState.employeeCount = parseInt(emp, 10);
+      
+      const qpd = params.get('qpd');
+      if (qpd) newCalcState.queriesPerDay = parseInt(qpd, 10);
+      
+      const tokens = params.get('tokens');
+      if (tokens) newCalcState.monthlyTokensMillions = parseInt(tokens, 10);
+      
+      const tool = params.get('tool');
+      if (tool) newCalcState.primaryTool = tool as any;
+      
+      const region = params.get('region');
+      if (region) newCalcState.region = region as any;
+
+      const scale = params.get('scale');
+      if (scale) setInitialScale(parseInt(scale, 10));
+
+      setCalcState(newCalcState);
+      setCurrentPage('calculator');
+      setShouldScroll(true);
+    }
+  }, []);
+
   return (
     <div className="min-h-screen flex flex-col selection:bg-teal-200">
       {/* Navigation */}
       <header className="sticky top-0 z-50 bg-paper/80 backdrop-blur-md border-b border-navy/5 print:hidden">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between gap-6 overflow-hidden">
           <button 
-            onClick={() => setCurrentPage('landing')}
+            onClick={() => handlePageChange('landing')}
             className="flex items-center gap-2 text-navy-dark hover:opacity-80 transition-opacity shrink-0"
           >
             <Droplet className="w-6 h-6 text-teal" />
@@ -50,31 +92,31 @@ export default function App() {
           
           <nav className="flex items-center gap-2 sm:gap-6 overflow-x-auto hide-scrollbar pb-1 -mb-1 w-full justify-start sm:justify-end">
             <button 
-              onClick={() => setCurrentPage('landing')}
+              onClick={() => handlePageChange('landing')}
               className={`text-sm font-medium transition-all shrink-0 active:scale-95 px-3 sm:px-4 py-2 rounded-lg ${currentPage === 'landing' ? 'text-teal bg-white shadow-sm' : 'text-navy-light hover:text-navy hover:bg-white/50 hover:shadow-sm'}`}
             >
               Overview
             </button>
             <button 
-              onClick={() => setCurrentPage('calculator')}
+              onClick={() => handlePageChange('calculator')}
               className={`text-sm font-medium transition-all shrink-0 active:scale-95 px-3 sm:px-4 py-2 rounded-lg ${currentPage === 'calculator' ? 'text-teal bg-white shadow-sm' : 'text-navy-light hover:text-navy hover:bg-white/50 hover:shadow-sm'}`}
             >
               Calculator
             </button>
             <button 
-              onClick={() => setCurrentPage('report')}
+              onClick={() => handlePageChange('report')}
               className={`text-sm font-medium transition-all shrink-0 active:scale-95 px-3 sm:px-4 py-2 rounded-lg ${currentPage === 'report' ? 'text-teal bg-white shadow-sm' : 'text-navy-light hover:text-navy hover:bg-white/50 hover:shadow-sm'}`}
             >
               ESG Report
             </button>
             <button 
-              onClick={() => setCurrentPage('methodology')}
+              onClick={() => handlePageChange('methodology')}
               className={`text-sm font-medium transition-all shrink-0 active:scale-95 px-3 sm:px-4 py-2 rounded-lg ${currentPage === 'methodology' ? 'text-teal bg-white shadow-sm' : 'text-navy-light hover:text-navy hover:bg-white/50 hover:shadow-sm'}`}
             >
               Methodology
             </button>
             <button 
-              onClick={() => setCurrentPage('research')}
+              onClick={() => handlePageChange('research')}
               className={`text-sm font-medium transition-all shrink-0 active:scale-95 px-3 sm:px-4 py-2 rounded-lg ${currentPage === 'research' ? 'text-teal bg-white shadow-sm' : 'text-navy-light hover:text-navy hover:bg-white/50 hover:shadow-sm'}`}
             >
               The Deep Dive
@@ -92,14 +134,16 @@ export default function App() {
       {/* Main Content */}
       <main className="flex-1">
         {currentPage === 'landing' && (
-          <Landing onStart={() => setCurrentPage('calculator')} onDeepDive={() => setCurrentPage('research')} />
+          <Landing onStart={() => handlePageChange('calculator')} onDeepDive={() => handlePageChange('research')} onMethodology={() => handlePageChange('methodology')} />
         )}
         
         {currentPage === 'calculator' && (
           <Calculator 
             state={calcState} 
             onChange={setCalcState} 
-            onNext={() => setCurrentPage('report')}
+            onNext={() => handlePageChange('report')}
+            initialScaleMultiplier={initialScale}
+            shouldScrollToResults={shouldScroll}
           />
         )}
 
