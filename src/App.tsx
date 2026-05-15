@@ -18,14 +18,18 @@ export interface ReportState {
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState<Page>('landing');
+  const [researchTab, setResearchTab] = useState<string>('evaporation');
   const [visitedPages, setVisitedPages] = useState<Set<Page>>(new Set(['landing']));
   const [initialScale, setInitialScale] = useState<number>(1);
   const [shouldScroll, setShouldScroll] = useState<boolean>(false);
   
-  const handlePageChange = (newPage: Page) => {
+  const handlePageChange = (newPage: Page, extra?: string) => {
     setCurrentPage(newPage);
+    if (newPage === 'research' && extra) {
+      setResearchTab(extra);
+    }
     if (!visitedPages.has(newPage)) {
-      window.scrollTo(0, 0);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       setVisitedPages(prev => new Set(prev).add(newPage));
     }
   };
@@ -142,6 +146,7 @@ export default function App() {
             state={calcState} 
             onChange={setCalcState} 
             onNext={() => handlePageChange('report')}
+            onDeepDive={() => handlePageChange('research', 'claude')}
             initialScaleMultiplier={initialScale}
             shouldScrollToResults={shouldScroll}
           />
@@ -160,7 +165,7 @@ export default function App() {
         )}
 
         {currentPage === 'research' && (
-          <Research />
+          <Research initialTab={researchTab} />
         )}
       </main>
 

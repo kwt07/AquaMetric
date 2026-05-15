@@ -17,11 +17,12 @@ interface Props {
   state: CalculatorState;
   onChange: (state: CalculatorState) => void;
   onNext: () => void;
+  onDeepDive?: () => void;
   initialScaleMultiplier?: number;
   shouldScrollToResults?: boolean;
 }
 
-export function Calculator({ state, onChange, onNext, initialScaleMultiplier = 1, shouldScrollToResults = false }: Props) {
+export function Calculator({ state, onChange, onNext, onDeepDive, initialScaleMultiplier = 1, shouldScrollToResults = false }: Props) {
   const result = calculateFootprint(state);
 
   const updateState = (updates: Partial<CalculatorState>) => {
@@ -196,7 +197,7 @@ export function Calculator({ state, onChange, onNext, initialScaleMultiplier = 1
                   <div>
                     <span>Average Daily Queries per Employee</span>
                   </div>
-                  <InfoTooltip content="A query equals roughly 10-50 interactions or generated pieces of content. Includes chat messages, code completions, or text generation." />
+                  <InfoTooltip content="A 'query' represents a single prompt and response (e.g., sending one message to an AI assistant or generating one image). It assumes an average length of ~130 tokens. For highly complex or long prompts, select the 'By API Usage (Tokens)' method instead." />
                 </label>
                 <div className="flex items-center gap-4">
                   <input 
@@ -281,7 +282,7 @@ export function Calculator({ state, onChange, onNext, initialScaleMultiplier = 1
             {state.primaryTool === 'claude' && (
               <div className="mt-3 p-3 bg-yellow-50/80 text-yellow-800 text-sm rounded-lg border border-yellow-200 leading-relaxed flex gap-2 items-start">
                 <span className="shrink-0 mt-0.5">⚠️</span>
-                <span>Claude's infrastructure trades local water efficiency for higher energy consumption. See <strong>The Deep Dive</strong> for the full carbon trade-off.</span>
+                <span>Claude's infrastructure trades local water efficiency for higher energy consumption. See <button onClick={onDeepDive} className="font-bold underline decoration-yellow-400 hover:text-yellow-900 transition-colors cursor-pointer">The Deep Dive</button> for the full carbon trade-off.</span>
               </div>
             )}
           </div>

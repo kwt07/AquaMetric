@@ -1,9 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { BookOpen, AlertTriangle, Scale, Target, Droplet, Globe, Map, Zap, ChevronRight } from 'lucide-react';
 
-export function Research() {
-  const [activeTab, setActiveTab] = useState('evaporation');
+interface Props {
+  initialTab?: string;
+}
+
+export function Research({ initialTab = 'evaporation' }: Props) {
+  const [activeTab, setActiveTab] = useState(initialTab);
+
+  // If initialTab changes from outside, respect it
+  useEffect(() => {
+    setActiveTab(initialTab);
+  }, [initialTab]);
 
   const tabs = [
     { id: 'evaporation', label: 'Evaporation Misconception', icon: Droplet },
