@@ -178,7 +178,7 @@ export function Landing({ onStart, onDeepDive, onMethodology }: Props) {
                       <li><strong>Scope:</strong> Calculations currently encompass Scope 1 (Data Center Cooling) and Scope 2 (Power Generation Cooling) only.</li>
                       <li><strong>Volume:</strong> "Global Average" assumes ~2.85ml per query. "Arid Region" assumes ~6.15L per 1 Million Tokens based on Li et al. (2025).</li>
                       <li><strong>Format:</strong> 1 Million Tokens is approximated as ~7,692 standard queries.</li>
-                      <li><strong>Equivalencies:</strong> Bathtub = 150 liters; Bottle = 0.5 liters; Human daily minimum survivable drinking water = ~3 liters.</li>
+                      <li><strong>Equivalencies:</strong> Bowl of rice (200g) = 400 liters (Malaysia average); Bottle = 0.5 liters; Human daily minimum survivable drinking water = ~3 liters.</li>
                     </ul>
                   </div>
                 </motion.div>

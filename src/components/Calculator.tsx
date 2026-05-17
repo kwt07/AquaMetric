@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { CalculatorState, calculateFootprint, AITool, Region } from '../lib/calculator';
-import { Droplet, Users, Zap, Cloud, GlassWater, Waves, AlertCircle, BarChart3, MapPin, Hash, Globe2, Info, Share2, Check } from 'lucide-react';
+import { Droplet, Users, Zap, Cloud, GlassWater, Wheat, AlertCircle, BarChart3, MapPin, Hash, Globe2, Info, Share2, Check } from 'lucide-react';
 
 const InfoTooltip = ({ content }: { content: React.ReactNode }) => (
   <div className="group relative flex items-center cursor-help">
@@ -45,7 +45,7 @@ export function Calculator({ state, onChange, onNext, onDeepDive, initialScaleMu
 
   const scaledLiters = result.litersPerYear * scaleMultiplier;
   const scaledBottles = result.bottles * scaleMultiplier;
-  const scaledBathtubs = result.bathtubs * scaleMultiplier;
+  const scaledRiceBowls = result.riceBowls * scaleMultiplier;
   const scaledHumanDays = result.humanDays * scaleMultiplier;
 
   const handleShare = async () => {
@@ -359,11 +359,11 @@ export function Calculator({ state, onChange, onNext, onDeepDive, initialScaleMu
                 <div className="text-xs text-white/60 leading-tight">Standard 500ml<br/>water bottles</div>
               </div>
               <div className="bg-white/5 border border-white/10 p-4 rounded-xl">
-                <Waves className="w-6 h-6 text-teal-400 mb-3" />
+                <Wheat className="w-6 h-6 text-teal-400 mb-3" />
                 <div className="text-2xl font-bold font-mono mb-1">
-                  {scaledBathtubs < 0.1 ? '< 0.1' : scaledBathtubs.toLocaleString(undefined, { maximumFractionDigits: 1 })}
+                  {scaledRiceBowls < 0.1 ? '< 0.1' : scaledRiceBowls.toLocaleString(undefined, { maximumFractionDigits: 1 })}
                 </div>
-                <div className="text-xs text-white/60 leading-tight">Standard bathtubs<br/>equivalent</div>
+                <div className="text-xs text-white/60 leading-tight">Bowls of rice (200g)<br/>equivalent</div>
               </div>
             </div>
 

@@ -98,7 +98,7 @@ export const calculateFootprint = (state: CalculatorState) => {
 
   
   const bottles = Math.round(litersPerYear / 0.5);
-  const bathtubs = litersPerYear / 150; // Standard bathtub ~150 liters
+  const riceBowls = litersPerYear / 400; // 400L per 200g of rice
   const humanDays = Math.round(litersPerYear / 2.5); // 2.5L per human per day
 
   let rating: 'Minimal' | 'Low' | 'Moderate' | 'High' | 'Critical' = 'Minimal';
@@ -110,7 +110,7 @@ export const calculateFootprint = (state: CalculatorState) => {
   return {
     litersPerYear: Math.round(litersPerYear),
     bottles,
-    bathtubs,
+    riceBowls,
     humanDays,
     rating,
     mlPerQuery: method === 'queries' ? modelMetrics.mlPerQuery[region] : (modelMetrics.mlPerMillionTokens[region] / 1000000)
